@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/meteocima/radar2wrf/radar"
+	"github.com/meteocima/magda_rd2wrf/radar"
 )
 
 func main() {

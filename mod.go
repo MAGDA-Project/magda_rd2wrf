@@ -1,1 +1,1 @@
-package radar2wrf
+package magda_rd2wrf

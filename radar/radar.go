@@ -9,6 +9,8 @@ import (
 	"github.com/fhs/go-netcdf/netcdf"
 )
 
+import "C"
+
 // CappiDataset ...
 type CappiDataset struct {
 	ds  *netcdf.Dataset
@@ -348,7 +350,7 @@ func Convert(dirname, radarOutFileName, dt string) (io.Reader, error) {
 	fmt.Println("CAPPI2", ds.Error())
 	ds.Open(filenameForVar(dirname, "CAPPI2", dt))
 
-	if ds.Error() == netcdf.Error(2) {
+	if ds.Error() == netcdf.Error(C.int(2)) {
 		ds.err = nil
 		ds.Close()
 		ds.err = nil
@@ -360,7 +362,7 @@ func Convert(dirname, radarOutFileName, dt string) (io.Reader, error) {
 	fmt.Println("CAPPI3", ds.Error())
 	ds.Open(filenameForVar(dirname, "CAPPI3", dt))
 
-	if ds.Error() == netcdf.Error(2) {
+	if ds.Error() == netcdf.Error(C.int(2)) {
 		ds.err = nil
 		ds.Close()
 		ds.err = nil
@@ -373,7 +375,7 @@ func Convert(dirname, radarOutFileName, dt string) (io.Reader, error) {
 	fmt.Println("CAPPI4", ds.Error())
 	ds.Open(filenameForVar(dirname, "CAPPI4", dt))
 
-	if ds.Error() == netcdf.Error(2) {
+	if ds.Error() == netcdf.Error(C.int(2)) {
 		ds.err = nil
 		ds.Close()
 		ds.err = nil
@@ -392,7 +394,7 @@ func Convert(dirname, radarOutFileName, dt string) (io.Reader, error) {
 
 	fmt.Println("ERR BBB", ds.Error())
 
-	if ds.Error() == netcdf.Error(2) {
+	if ds.Error() == netcdf.Error(C.int(2)) {
 		fmt.Println("CAPPI5 ERRAAA")
 		ds.err = nil
 		ds.Close()
