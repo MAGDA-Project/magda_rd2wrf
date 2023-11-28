@@ -39,3 +39,4 @@
 go.work
 magda_rd2wrf
 !cli/**
+fixtures
