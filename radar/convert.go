@@ -41,8 +41,8 @@ func writeConvertedDataTo(resultW io.WriteCloser, dims *MosaicData, dtRequested 
 	result := bufio.NewWriterSize(resultW, 1000000)
 	defer result.Flush()
 
-	maxLon := float32(-1)
-	maxLat := float32(-1)
+	maxLon := float64(-1)
+	maxLat := float64(-1)
 	instant := dtRequested.Format("2006-01-02_15:04")
 	totObs := 0
 
@@ -61,8 +61,8 @@ func writeConvertedDataTo(resultW io.WriteCloser, dims *MosaicData, dtRequested 
 			}
 		}
 	} else {
-		maxLon = float32(1)
-		maxLat = float32(1)
+		maxLon = float64(1)
+		maxLat = float64(1)
 	}
 
 	for i := int64(0); i < dims.Width*dims.Height; i++ {
@@ -119,15 +119,15 @@ func writeConvertedDataTo(resultW io.WriteCloser, dims *MosaicData, dtRequested 
 
 	for x := int64(0); x < dims.Width; x++ {
 		for y := int64(dims.Height) - 1; y >= int64(0); y-- {
-			i := x + y*dims.Width
-
-			lat := dims.Lat[i]
-			lon := dims.Lon[i]
+			//
+			lat := dims.Lat[y]
+			lon := dims.Lon[x]
 
 			f2 := float32(-1)
 			f3 := float32(-1)
 			f4 := float32(-1)
 			f5 := float32(-1)
+			i := x + y*dims.Width
 
 			if dims.Cappi2 != nil {
 				f2 = dims.Cappi2[i]
@@ -175,22 +175,22 @@ func readDataFromFile(mos *MosaicData, dirname string, dt time.Time, dest *[]flo
 	if mos.Width == -1 {
 		fmt.Println("MosaicData dimensions not initialized.")
 
-		if mos.Width, err = GetDimensionLen(&ds, "cols"); err != nil {
+		if mos.Width, err = GetDimensionLen(&ds, "lon"); err != nil {
 			return err
 		}
 		fmt.Println("Width", mos.Width)
 
-		if mos.Height, err = GetDimensionLen(&ds, "rows"); err != nil {
+		if mos.Height, err = GetDimensionLen(&ds, "lat"); err != nil {
 			return err
 		}
 		fmt.Println("Height", mos.Height)
 
-		if mos.Lat, err = ReadFloatVar(&ds, "lat"); err != nil {
+		if mos.Lat, err = ReadDoubleVar(&ds, "lat"); err != nil {
 			return err
 		}
 		fmt.Println("Latitude", mos.Lat)
 
-		if mos.Lon, err = ReadFloatVar(&ds, "lon"); err != nil {
+		if mos.Lon, err = ReadDoubleVar(&ds, "lon"); err != nil {
 			return err
 		}
 		fmt.Println("Longitude", mos.Lon)

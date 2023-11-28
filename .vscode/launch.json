@@ -10,11 +10,7 @@
             "request": "launch",
             "mode": "debug",
             "program": "cli/magda_rd2wrf/cli.go",
-            "args": ["/home/wrfprod/repos/magda_rd2wrf/fixtures","ob.radar.ascii","201707260010"],
-            "env": {
-                "LD_LIBRARY_PATH": "/opt/share/sw/GCC/WRF-KIT/lib",
-                "PKG_CONFIG_PATH": "/opt/share/sw/GCC/WRF-KIT/lib/pkgconfig"
-            }
+            "args": ["/home/parroit/repos/cima/magda/obstools/magda_rd2wrf/fixtures","ob.radar.ascii","201707260010"],
         }
 
     ],

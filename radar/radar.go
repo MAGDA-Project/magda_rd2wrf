@@ -21,7 +21,27 @@ func GetDimensionLen(ds *netcdf.Dataset, name string) (int64, error) {
 	return int64(dimlen), nil
 }
 
-// ReadFloatVar ...
+func ReadDoubleVar(ds *netcdf.Dataset, name string) ([]float64, error) {
+	var v netcdf.Var
+	var vlen uint64
+	var err error
+
+	if v, err = ds.Var(name); err != nil {
+		return nil, err
+	}
+
+	if vlen, err = v.Len(); err != nil {
+		return nil, err
+	}
+
+	res := make([]float64, vlen)
+	if err = v.ReadFloat64s(res); err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
 func ReadFloatVar(ds *netcdf.Dataset, name string) ([]float32, error) {
 	var v netcdf.Var
 	var vlen uint64
@@ -72,8 +92,8 @@ func ReadTimeVar(ds *netcdf.Dataset, name string) ([]time.Time, error) {
 
 // MosaicData ...
 type MosaicData struct {
-	Lat                            []float32
-	Lon                            []float32
+	Lat                            []float64
+	Lon                            []float64
 	Width                          int64
 	Height                         int64
 	Instants                       []time.Time
