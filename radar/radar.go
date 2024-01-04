@@ -65,6 +65,7 @@ func ReadFloatVar(ds *netcdf.Dataset, name string) ([]float32, error) {
 
 // ReadTimeVar ...
 func ReadTimeVar(ds *netcdf.Dataset, name string) ([]time.Time, error) {
+
 	var varDs netcdf.Var
 	var err error
 	var varlen uint64

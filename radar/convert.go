@@ -35,8 +35,6 @@ func writeRadarData(f io.Writer, val float32, height float64) {
 }
 
 func writeConvertedDataTo(resultW io.WriteCloser, dims *MosaicData, dtRequested time.Time) {
-	fmt.Println("writeConvertedDataTo")
-
 	defer resultW.Close()
 	result := bufio.NewWriterSize(resultW, 1000000)
 	defer result.Flush()
@@ -169,39 +167,40 @@ func readDataFromFile(mos *MosaicData, dirname string, dt time.Time, dest *[]flo
 	var err error
 	var ds netcdf.Dataset
 
-	if ds, err = netcdf.OpenFile(filenameForLev(dirname, cappilev, dt), netcdf.FileMode(netcdf.NOWRITE)); err != nil {
-		return err
+	fname := filenameForLev(dirname, cappilev, dt)
+	if ds, err = netcdf.OpenFile(fname, netcdf.FileMode(netcdf.NOWRITE)); err != nil {
+		return fmt.Errorf("cannot open CAPPI file %s: %w", fname, err)
 	}
 	if mos.Width == -1 {
-		fmt.Println("MosaicData dimensions not initialized.")
+		//fmt.Println("MosaicData dimensions not initialized.")
 
 		if mos.Width, err = GetDimensionLen(&ds, "lon"); err != nil {
-			return err
+			return fmt.Errorf("cannot get dimension lon from CAPPI file %s: %w", fname, err)
 		}
-		fmt.Println("Width", mos.Width)
+		//fmt.Println("Width", mos.Width)
 
 		if mos.Height, err = GetDimensionLen(&ds, "lat"); err != nil {
-			return err
+			return fmt.Errorf("cannot get dimension lat from CAPPI file %s: %w", fname, err)
 		}
-		fmt.Println("Height", mos.Height)
+		//fmt.Println("Height", mos.Height)
 
 		if mos.Lat, err = ReadDoubleVar(&ds, "lat"); err != nil {
-			return err
+			return fmt.Errorf("cannot read lat from CAPPI file %s: %w", fname, err)
 		}
-		fmt.Println("Latitude", mos.Lat)
+		//fmt.Println("Latitude", mos.Lat)
 
 		if mos.Lon, err = ReadDoubleVar(&ds, "lon"); err != nil {
-			return err
+			return fmt.Errorf("cannot read lon from CAPPI file %s: %w", fname, err)
 		}
-		fmt.Println("Longitude", mos.Lon)
+		//fmt.Println("Longitude", mos.Lon)
 
 		if mos.Instants, err = ReadTimeVar(&ds, "time"); err != nil {
-			return err
+			return fmt.Errorf("cannot read time from CAPPI file %s: %w", fname, err)
 		}
-		fmt.Println("Time", mos.Instants)
+		//fmt.Println("Time", mos.Instants)
 	}
 	if *dest, err = ReadFloatVar(&ds, "DBZH"); err != nil {
-		return err
+		return fmt.Errorf("cannot read DBZH from CAPPI file %s: %w", fname, err)
 	}
 
 	return ds.Close()
@@ -214,16 +213,16 @@ func Convert(dirname string, dt time.Time) (io.Reader, error) {
 	}
 	var err error
 	if err = readDataFromFile(&mos, dirname, dt, &mos.Cappi2, 2); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot read CAPPI level 2 file: %w", err)
 	}
 	if err = readDataFromFile(&mos, dirname, dt, &mos.Cappi3, 3); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot read CAPPI level 3 file: %w", err)
 	}
 	if err = readDataFromFile(&mos, dirname, dt, &mos.Cappi4, 4); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot read CAPPI level 4 file: %w", err)
 	}
 	if err = readDataFromFile(&mos, dirname, dt, &mos.Cappi5, 5); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot read CAPPI level 5 file: %w", err)
 	}
 
 	reader, result := io.Pipe()

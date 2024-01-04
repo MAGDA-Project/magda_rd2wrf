@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -12,7 +13,8 @@ import (
 
 func main() {
 	if len(os.Args) < 3 {
-		log.Fatal("usage: magda_rd2wrf <inputdir> <outfilename> YYYYMMDDHHNN")
+		fmt.Fprintln(os.Stderr, "usage: magda_rd2wrf <inputdir> <outfilename> YYYYMMDDHHNN")
+		os.Exit(1)
 	}
 
 	var instant time.Time
