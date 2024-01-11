@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"os"
+	"os/exec"
 	"time"
 
 	"github.com/fhs/go-netcdf/netcdf"
@@ -39,8 +41,8 @@ func writeConvertedDataTo(resultW io.WriteCloser, dims *MosaicData, dtRequested 
 	result := bufio.NewWriterSize(resultW, 1000000)
 	defer result.Flush()
 
-	maxLon := float64(-1)
-	maxLat := float64(-1)
+	maxLon := float32(-1)
+	maxLat := float32(-1)
 	instant := dtRequested.Format("2006-01-02_15:04")
 	totObs := 0
 
@@ -59,8 +61,8 @@ func writeConvertedDataTo(resultW io.WriteCloser, dims *MosaicData, dtRequested 
 			}
 		}
 	} else {
-		maxLon = float64(1)
-		maxLat = float64(1)
+		maxLon = float32(1)
+		maxLat = float32(1)
 	}
 
 	for i := int64(0); i < dims.Width*dims.Height; i++ {
@@ -113,7 +115,7 @@ func writeConvertedDataTo(resultW io.WriteCloser, dims *MosaicData, dtRequested 
 		return
 	}
 
-	instant = dims.Instants[0].Format("2006-01-02_15:04")
+	//instant = dims.Instants[0].Format("2006-01-02_15:04")
 
 	for x := int64(0); x < dims.Width; x++ {
 		for y := int64(dims.Height) - 1; y >= int64(0); y-- {
@@ -168,35 +170,48 @@ func readDataFromFile(mos *MosaicData, dirname string, dt time.Time, dest *[]flo
 	var ds netcdf.Dataset
 
 	fname := filenameForLev(dirname, cappilev, dt)
+
+	if _, err := os.Stat(fname); os.IsNotExist(err) {
+		*dest = nil
+		return nil
+	}
+
+	// regrid to the same resolution as domain
+	err = exec.Command("cdo", "remapbil,~/temp_Romania.nc", fname, fname+".regrid.nc").Run()
+	if err != nil {
+		return fmt.Errorf("cannot regrid CAPPI file %s: %w", fname, err)
+	}
+	fname += ".regrid.nc"
+
 	if ds, err = netcdf.OpenFile(fname, netcdf.FileMode(netcdf.NOWRITE)); err != nil {
 		return fmt.Errorf("cannot open CAPPI file %s: %w", fname, err)
 	}
 	if mos.Width == -1 {
 		//fmt.Println("MosaicData dimensions not initialized.")
 
-		if mos.Width, err = GetDimensionLen(&ds, "lon"); err != nil {
-			return fmt.Errorf("cannot get dimension lon from CAPPI file %s: %w", fname, err)
+		if mos.Width, err = GetDimensionLen(&ds, "west_east"); err != nil {
+			return fmt.Errorf("cannot get dimension west_east from CAPPI file %s: %w", fname, err)
 		}
 		//fmt.Println("Width", mos.Width)
 
-		if mos.Height, err = GetDimensionLen(&ds, "lat"); err != nil {
-			return fmt.Errorf("cannot get dimension lat from CAPPI file %s: %w", fname, err)
+		if mos.Height, err = GetDimensionLen(&ds, "south_north"); err != nil {
+			return fmt.Errorf("cannot get dimension south_north from CAPPI file %s: %w", fname, err)
 		}
 		//fmt.Println("Height", mos.Height)
 
-		if mos.Lat, err = ReadDoubleVar(&ds, "lat"); err != nil {
-			return fmt.Errorf("cannot read lat from CAPPI file %s: %w", fname, err)
+		if mos.Lat, err = ReadFloatVar(&ds, "XLAT"); err != nil {
+			return fmt.Errorf("cannot read XLAT from CAPPI file %s: %w", fname, err)
 		}
 		//fmt.Println("Latitude", mos.Lat)
 
-		if mos.Lon, err = ReadDoubleVar(&ds, "lon"); err != nil {
-			return fmt.Errorf("cannot read lon from CAPPI file %s: %w", fname, err)
+		if mos.Lon, err = ReadFloatVar(&ds, "XLONG"); err != nil {
+			return fmt.Errorf("cannot read XLONG from CAPPI file %s: %w", fname, err)
 		}
 		//fmt.Println("Longitude", mos.Lon)
 
-		if mos.Instants, err = ReadTimeVar(&ds, "time"); err != nil {
-			return fmt.Errorf("cannot read time from CAPPI file %s: %w", fname, err)
-		}
+		//if mos.Instants, err = ReadTimeVar(&ds, "time"); err != nil {
+		//	return fmt.Errorf("cannot read time from CAPPI file %s: %w", fname, err)
+		//}
 		//fmt.Println("Time", mos.Instants)
 	}
 	if *dest, err = ReadFloatVar(&ds, "DBZH"); err != nil {
