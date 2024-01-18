@@ -10,21 +10,24 @@ The module use go-netcdf to read CAPPI netcdf files.
 In order to use it, you need the developer version of the
 library provided by your distribution installed.
 
-On ubuntu you can install it with:
+Furthermore, netcdf files are preprocessed using CDO and NCO tools.
+
+On ubuntu you can install these dependencies with:
 
 ```bash
-sudo apt install libnetcdf-dev
+sudo apt install libnetcdf-dev cdo nco
 ```
 
-On Typhoon, it can be loaded with the WRF-KIT2 module:
+On Typhoon, `wrfprod` user can load them with these modules:
 
 ```bash
-module load gcc-8.3.1/WRF-KIT2
+module load CDO NCO
 ```
 
 ## Usage on CIMA Typhoon
 
 `magda_rd2wrf` is already present in /data/safe/home/wrfprod/bin/magda_rd2wrf
+A template file to regrid radar filse is already present in path `~/temp_Romania.nc`
 
 ## Command line usage
 
