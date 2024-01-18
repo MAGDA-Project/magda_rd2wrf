@@ -1,4 +1,4 @@
-# MAGDA Weather stations to WRF
+# MAGDA radars to WRF
 
 This module can be used to convert radar data in netcdf 
 MAGDA format into WRF ascii format.
