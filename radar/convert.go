@@ -176,14 +176,24 @@ func readDataFromFile(mos *MosaicData, dirname string, dt time.Time, dest *[]flo
 		return nil
 	}
 
+	fnameRegrid := fname + ".regrid.nc"
+
 	// regrid to the same resolution as domain
-	err = exec.Command("cdo", "remapbil,~/temp_Romania.nc", fname, fname+".regrid.nc").Run()
+	err = exec.Command("cdo", "remapbil,~/temp_Romania.nc", fname, fnameRegrid).Run()
 	if err != nil {
 		return fmt.Errorf("cannot regrid CAPPI file %s: %w", fname, err)
 	}
-	fname += ".regrid.nc"
+	defer os.Remove(fnameRegrid)
 
-	if ds, err = netcdf.OpenFile(fname, netcdf.FileMode(netcdf.NOWRITE)); err != nil {
+	fnameFiltered := fname + ".filtered.nc"
+	operator := "where(DBZH < 10) DBZH=-9999"
+
+	if err := exec.Command("ncap2", "-s", operator, fnameRegrid, fnameFiltered).Run(); err != nil {
+		return fmt.Errorf("cannot filter CAPPI file %s: %w", fname, err)
+	}
+	defer os.Remove(fnameFiltered)
+
+	if ds, err = netcdf.OpenFile(fnameFiltered, netcdf.FileMode(netcdf.NOWRITE)); err != nil {
 		return fmt.Errorf("cannot open CAPPI file %s: %w", fname, err)
 	}
 	if mos.Width == -1 {
