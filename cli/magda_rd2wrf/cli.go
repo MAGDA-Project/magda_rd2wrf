@@ -12,11 +12,12 @@ import (
 )
 
 func main() {
-	if len(os.Args) < 3 {
+	grdTemplate, ok := os.LookupEnv("GRD_TEMPL")
+	if len(os.Args) < 3 || !ok {
 		fmt.Fprintln(os.Stderr, "usage: GRD_TEMPL=grid.template magda_rd2wrf <inputdir> <outfilename> YYYYMMDDHHNN")
+		fmt.Fprintln(os.Stderr, "$GRD_TEMPL must contains full path of a cdo template file.")
 		os.Exit(1)
 	}
-
 	var instant time.Time
 	var reader io.Reader
 	var outfile *os.File
@@ -33,12 +34,6 @@ func main() {
 		log.Fatal(err)
 	}
 	defer outfile.Close()
-
-	grdTemplate, ok := os.LookupEnv("GRD_TEMPL")
-	if !ok {
-		fmt.Fprintln(os.Stderr, "Fatal: $GRD_TEMPL must contains full path of a cdo template file.")
-		os.Exit(1)
-	}
 
 	if reader, err = radar.Convert(os.Args[1], grdTemplate, instant); err != nil {
 		log.Fatal(err)

@@ -41,8 +41,8 @@ func writeConvertedDataTo(resultW io.WriteCloser, dims *MosaicData, dtRequested 
 	result := bufio.NewWriterSize(resultW, 1000000)
 	defer result.Flush()
 
-	maxLon := float32(-1)
-	maxLat := float32(-1)
+	maxLon := float64(-1)
+	maxLat := float64(-1)
 	instant := dtRequested.Format("2006-01-02_15:04")
 	totObs := 0
 
@@ -65,8 +65,8 @@ func writeConvertedDataTo(resultW io.WriteCloser, dims *MosaicData, dtRequested 
 			}
 		}
 	} else {
-		maxLon = float32(1)
-		maxLat = float32(1)
+		maxLon = float64(1)
+		maxLat = float64(1)
 	}
 
 	for i := int64(0); i < dims.Width*dims.Height; i++ {
@@ -205,10 +205,10 @@ func writeConvertedDataTo(resultW io.WriteCloser, dims *MosaicData, dtRequested 
 				writeRadarData(result, f4, 4000.0)
 				writeRadarData(result, f5, 5000.0)
 
-				writeRadarData(result, f2, 6000.0)
-				writeRadarData(result, f3, 7000.0)
-				writeRadarData(result, f4, 8000.0)
-				writeRadarData(result, f5, 9000.0)
+				writeRadarData(result, f6, 6000.0)
+				writeRadarData(result, f7, 7000.0)
+				writeRadarData(result, f8, 8000.0)
+				writeRadarData(result, f9, 9000.0)
 			}
 		}
 	}
@@ -228,17 +228,25 @@ func readDataFromFile(mos *MosaicData, gridTmpl string, dirname string, dt time.
 	fnameRegrid := fname + ".regrid.nc"
 
 	// regrid to the same resolution as domain
-	err = exec.Command("cdo", "remapbil,"+gridTmpl, fname, fnameRegrid).Run()
+	out, err := exec.Command("cdo", "remapbil,"+gridTmpl, fname, fnameRegrid).Output()
 	if err != nil {
-		return fmt.Errorf("cannot regrid CAPPI file %s: %w", fname, err)
+		if e, ok := err.(*exec.ExitError); ok {
+			return fmt.Errorf("cannot regrid CAPPI file %s: %w\nCommand output:\n%s", fname, e, string(e.Stderr)+"\n"+string(out))
+		} else {
+			return fmt.Errorf("cannot regrid CAPPI file %s: %w", fname, err)
+		}
 	}
 	defer os.Remove(fnameRegrid)
 
 	fnameFiltered := fname + ".filtered.nc"
 	operator := "where(DBZH < 10) DBZH=-9999"
 
-	if err := exec.Command("ncap2", "-s", operator, fnameRegrid, fnameFiltered).Run(); err != nil {
-		return fmt.Errorf("cannot filter CAPPI file %s: %w", fname, err)
+	if out, err := exec.Command("ncap2", "-s", operator, fnameRegrid, fnameFiltered).Output(); err != nil {
+		if e, ok := err.(*exec.ExitError); ok {
+			return fmt.Errorf("cannot filter CAPPI file %s: %w\nCommand output:\n%s", fname, e, string(e.Stderr)+"\n"+string(out))
+		} else {
+			return fmt.Errorf("cannot filter CAPPI file %s: %w", fname, err)
+		}
 	}
 	defer os.Remove(fnameFiltered)
 
@@ -248,23 +256,23 @@ func readDataFromFile(mos *MosaicData, gridTmpl string, dirname string, dt time.
 	if mos.Width == -1 {
 		//fmt.Println("MosaicData dimensions not initialized.")
 
-		if mos.Width, err = GetDimensionLen(&ds, "west_east"); err != nil {
-			return fmt.Errorf("cannot get dimension west_east from CAPPI file %s: %w", fname, err)
+		if mos.Width, err = GetDimensionLen(&ds, "lon"); err != nil {
+			return fmt.Errorf("cannot get dimension lon from CAPPI file %s: %w", fname, err)
 		}
 		//fmt.Println("Width", mos.Width)
 
-		if mos.Height, err = GetDimensionLen(&ds, "south_north"); err != nil {
-			return fmt.Errorf("cannot get dimension south_north from CAPPI file %s: %w", fname, err)
+		if mos.Height, err = GetDimensionLen(&ds, "lat"); err != nil {
+			return fmt.Errorf("cannot get dimension lat from CAPPI file %s: %w", fname, err)
 		}
 		//fmt.Println("Height", mos.Height)
 
-		if mos.Lat, err = ReadFloatVar(&ds, "XLAT"); err != nil {
-			return fmt.Errorf("cannot read XLAT from CAPPI file %s: %w", fname, err)
+		if mos.Lat, err = ReadDoubleVar(&ds, "lat"); err != nil {
+			return fmt.Errorf("cannot read lat from CAPPI file %s: %w", fname, err)
 		}
 		//fmt.Println("Latitude", mos.Lat)
 
-		if mos.Lon, err = ReadFloatVar(&ds, "XLONG"); err != nil {
-			return fmt.Errorf("cannot read XLONG from CAPPI file %s: %w", fname, err)
+		if mos.Lon, err = ReadDoubleVar(&ds, "lon"); err != nil {
+			return fmt.Errorf("cannot read lon from CAPPI file %s: %w", fname, err)
 		}
 		//fmt.Println("Longitude", mos.Lon)
 

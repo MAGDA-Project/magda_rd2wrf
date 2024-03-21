@@ -93,8 +93,8 @@ func ReadTimeVar(ds *netcdf.Dataset, name string) ([]time.Time, error) {
 
 // MosaicData ...
 type MosaicData struct {
-	Lat    []float32
-	Lon    []float32
+	Lat    []float64
+	Lon    []float64
 	Width  int64
 	Height int64
 	//Instants                       []time.Time

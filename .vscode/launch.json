@@ -5,14 +5,22 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "CLI",
+            "name": "CLI SWISS",
             "type": "go",
             "request": "launch",
             "mode": "debug",
             "program": "cli/magda_rd2wrf/cli.go",
-            "args": ["/home/parroit/repos/cima/magda/obstools/magda_rd2wrf/fixtures/SWISS","ob.radar.ascii","202402121000"],
-            "env": {"GRD_TEMPL": "/home/parroit/repos/cima/magda/obstools/magda_rd2wrf/scripts/grid.template"}
+            "args": ["/home/parroit/repos/cima/magda/obstools/magda_rd2wrf/fixtures/swiss","swiss.ob.radar.ascii","202402121000"],
+            "env": {"GRD_TEMPL": "/home/parroit/repos/cima/magda/obstools/magda_rd2wrf/scripts/swiss.grid.template"}
+        },
+        {
+            "name": "CLI ROMANIA",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "cli/magda_rd2wrf/cli.go",
+            "args": ["/home/parroit/repos/cima/magda/obstools/magda_rd2wrf/fixtures/","ob.radar.ascii","201707260000"],
+            "env": {"GRD_TEMPL": "/home/parroit/repos/cima/magda/obstools/magda_rd2wrf/scripts/romania.grid.template"}
         }
-
     ],
 }
