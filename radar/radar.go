@@ -98,5 +98,6 @@ type MosaicData struct {
 	Width  int64
 	Height int64
 	//Instants                       []time.Time
-	Cappi2, Cappi3, Cappi4, Cappi5 []float32
+	Cappi2, Cappi3, Cappi4, Cappi5,
+	Cappi6, Cappi7, Cappi8, Cappi9 []float32
 }

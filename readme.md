@@ -48,3 +48,17 @@ Options:
         date and hour of the radar data to convert [YYYYMMDDHH]
 ```
 
+cdo -remapbil,grid.template 202402121000-CAPPI02.nc 202402121000-CAPPI02-regrid.nc
+
+gridtype = lonlat
+xsize    = 678
+ysize    = 467
+xfirst   = -0.65
+xinc     = 0.0225
+yfirst   = 39.80
+yinc     = 0.0225
+
+i dati non ancora regrigliati, sono su filse in /home/wrfprod/magda
+
+[4:19 PM] Francesco Uboldi
+/rhomes/francesco.uboldi/MAGDA/nc_cappi/

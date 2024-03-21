@@ -10,7 +10,8 @@
             "request": "launch",
             "mode": "debug",
             "program": "cli/magda_rd2wrf/cli.go",
-            "args": ["/home/parroit/repos/cima/magda/obstools/magda_rd2wrf/fixtures","ob.radar.ascii","201906240000"],
+            "args": ["/home/parroit/repos/cima/magda/obstools/magda_rd2wrf/fixtures/SWISS","ob.radar.ascii","202402121000"],
+            "env": {"GRD_TEMPL": "/home/parroit/repos/cima/magda/obstools/magda_rd2wrf/scripts/grid.template"}
         }
 
     ],

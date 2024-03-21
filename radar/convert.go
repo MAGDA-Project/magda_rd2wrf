@@ -49,7 +49,11 @@ func writeConvertedDataTo(resultW io.WriteCloser, dims *MosaicData, dtRequested 
 	if dims.Cappi2 != nil ||
 		dims.Cappi3 != nil ||
 		dims.Cappi4 != nil ||
-		dims.Cappi5 != nil {
+		dims.Cappi5 != nil ||
+		dims.Cappi6 != nil ||
+		dims.Cappi7 != nil ||
+		dims.Cappi8 != nil ||
+		dims.Cappi9 != nil {
 		for _, l := range dims.Lon {
 			if l > maxLon {
 				maxLon = l
@@ -70,6 +74,10 @@ func writeConvertedDataTo(resultW io.WriteCloser, dims *MosaicData, dtRequested 
 		f3 := float32(-1)
 		f4 := float32(-1)
 		f5 := float32(-1)
+		f6 := float32(-1)
+		f7 := float32(-1)
+		f8 := float32(-1)
+		f9 := float32(-1)
 
 		if dims.Cappi2 != nil {
 			f2 = dims.Cappi2[i]
@@ -87,7 +95,23 @@ func writeConvertedDataTo(resultW io.WriteCloser, dims *MosaicData, dtRequested 
 			f5 = dims.Cappi5[i]
 		}
 
-		if f2 >= 0 || f3 >= 0 || f4 >= 0 || f5 >= 0 {
+		if dims.Cappi6 != nil {
+			f6 = dims.Cappi6[i]
+		}
+
+		if dims.Cappi7 != nil {
+			f7 = dims.Cappi7[i]
+		}
+
+		if dims.Cappi8 != nil {
+			f8 = dims.Cappi8[i]
+		}
+
+		if dims.Cappi9 != nil {
+			f9 = dims.Cappi9[i]
+		}
+
+		if f2 >= 0 || f3 >= 0 || f4 >= 0 || f5 >= 0 || f6 >= 0 || f7 >= 0 || f8 >= 0 || f9 >= 0 {
 			totObs++
 		}
 	}
@@ -111,7 +135,11 @@ func writeConvertedDataTo(resultW io.WriteCloser, dims *MosaicData, dtRequested 
 	if dims.Cappi2 == nil &&
 		dims.Cappi3 == nil &&
 		dims.Cappi4 == nil &&
-		dims.Cappi5 == nil {
+		dims.Cappi5 == nil &&
+		dims.Cappi6 == nil &&
+		dims.Cappi7 == nil &&
+		dims.Cappi8 == nil &&
+		dims.Cappi9 == nil {
 		return
 	}
 
@@ -127,6 +155,10 @@ func writeConvertedDataTo(resultW io.WriteCloser, dims *MosaicData, dtRequested 
 			f3 := float32(-1)
 			f4 := float32(-1)
 			f5 := float32(-1)
+			f6 := float32(-1)
+			f7 := float32(-1)
+			f8 := float32(-1)
+			f9 := float32(-1)
 			i := x + y*dims.Width
 
 			if dims.Cappi2 != nil {
@@ -141,8 +173,20 @@ func writeConvertedDataTo(resultW io.WriteCloser, dims *MosaicData, dtRequested 
 			if dims.Cappi5 != nil {
 				f5 = dims.Cappi5[i]
 			}
+			if dims.Cappi6 != nil {
+				f6 = dims.Cappi6[i]
+			}
+			if dims.Cappi7 != nil {
+				f7 = dims.Cappi7[i]
+			}
+			if dims.Cappi8 != nil {
+				f8 = dims.Cappi8[i]
+			}
+			if dims.Cappi9 != nil {
+				f9 = dims.Cappi9[i]
+			}
 
-			if f2 >= 0 || f3 >= 0 || f4 >= 0 || f5 >= 0 {
+			if f2 >= 0 || f3 >= 0 || f4 >= 0 || f5 >= 0 || f6 >= 0 || f7 >= 0 || f8 >= 0 || f9 >= 0 {
 				fmt.Fprintf(
 					result,
 					//!----Write data
@@ -160,12 +204,17 @@ func writeConvertedDataTo(resultW io.WriteCloser, dims *MosaicData, dtRequested 
 				writeRadarData(result, f3, 3000.0)
 				writeRadarData(result, f4, 4000.0)
 				writeRadarData(result, f5, 5000.0)
+
+				writeRadarData(result, f2, 6000.0)
+				writeRadarData(result, f3, 7000.0)
+				writeRadarData(result, f4, 8000.0)
+				writeRadarData(result, f5, 9000.0)
 			}
 		}
 	}
 }
 
-func readDataFromFile(mos *MosaicData, dirname string, dt time.Time, dest *[]float32, cappilev int) error {
+func readDataFromFile(mos *MosaicData, gridTmpl string, dirname string, dt time.Time, dest *[]float32, cappilev int) error {
 	var err error
 	var ds netcdf.Dataset
 
@@ -179,7 +228,7 @@ func readDataFromFile(mos *MosaicData, dirname string, dt time.Time, dest *[]flo
 	fnameRegrid := fname + ".regrid.nc"
 
 	// regrid to the same resolution as domain
-	err = exec.Command("cdo", "remapbil,~/temp_Romania.nc", fname, fnameRegrid).Run()
+	err = exec.Command("cdo", "remapbil,"+gridTmpl, fname, fnameRegrid).Run()
 	if err != nil {
 		return fmt.Errorf("cannot regrid CAPPI file %s: %w", fname, err)
 	}
@@ -232,22 +281,42 @@ func readDataFromFile(mos *MosaicData, dirname string, dt time.Time, dest *[]flo
 }
 
 // Convert ...
-func Convert(dirname string, dt time.Time) (io.Reader, error) {
+func Convert(dirname string, gridTmpl string, dt time.Time) (io.Reader, error) {
 	mos := MosaicData{
 		Width: -1,
 	}
+
 	var err error
-	if err = readDataFromFile(&mos, dirname, dt, &mos.Cappi2, 2); err != nil {
+	if err = readDataFromFile(&mos, gridTmpl, dirname, dt, &mos.Cappi2, 2); err != nil {
 		return nil, fmt.Errorf("cannot read CAPPI level 2 file: %w", err)
 	}
-	if err = readDataFromFile(&mos, dirname, dt, &mos.Cappi3, 3); err != nil {
+
+	if err = readDataFromFile(&mos, gridTmpl, dirname, dt, &mos.Cappi3, 3); err != nil {
 		return nil, fmt.Errorf("cannot read CAPPI level 3 file: %w", err)
 	}
-	if err = readDataFromFile(&mos, dirname, dt, &mos.Cappi4, 4); err != nil {
+
+	if err = readDataFromFile(&mos, gridTmpl, dirname, dt, &mos.Cappi4, 4); err != nil {
 		return nil, fmt.Errorf("cannot read CAPPI level 4 file: %w", err)
 	}
-	if err = readDataFromFile(&mos, dirname, dt, &mos.Cappi5, 5); err != nil {
+
+	if err = readDataFromFile(&mos, gridTmpl, dirname, dt, &mos.Cappi5, 5); err != nil {
 		return nil, fmt.Errorf("cannot read CAPPI level 5 file: %w", err)
+	}
+
+	if err = readDataFromFile(&mos, gridTmpl, dirname, dt, &mos.Cappi6, 6); err != nil {
+		return nil, fmt.Errorf("cannot read CAPPI level 6 file: %w", err)
+	}
+
+	if err = readDataFromFile(&mos, gridTmpl, dirname, dt, &mos.Cappi7, 7); err != nil {
+		return nil, fmt.Errorf("cannot read CAPPI level 7 file: %w", err)
+	}
+
+	if err = readDataFromFile(&mos, gridTmpl, dirname, dt, &mos.Cappi8, 8); err != nil {
+		return nil, fmt.Errorf("cannot read CAPPI level 8 file: %w", err)
+	}
+
+	if err = readDataFromFile(&mos, gridTmpl, dirname, dt, &mos.Cappi9, 9); err != nil {
+		return nil, fmt.Errorf("cannot read CAPPI level 9 file: %w", err)
 	}
 
 	reader, result := io.Pipe()

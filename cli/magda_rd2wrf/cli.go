@@ -13,7 +13,7 @@ import (
 
 func main() {
 	if len(os.Args) < 3 {
-		fmt.Fprintln(os.Stderr, "usage: magda_rd2wrf <inputdir> <outfilename> YYYYMMDDHHNN")
+		fmt.Fprintln(os.Stderr, "usage: GRD_TEMPL=grid.template magda_rd2wrf <inputdir> <outfilename> YYYYMMDDHHNN")
 		os.Exit(1)
 	}
 
@@ -34,7 +34,13 @@ func main() {
 	}
 	defer outfile.Close()
 
-	if reader, err = radar.Convert(os.Args[1], instant); err != nil {
+	grdTemplate, ok := os.LookupEnv("GRD_TEMPL")
+	if !ok {
+		fmt.Fprintln(os.Stderr, "Fatal: $GRD_TEMPL must contains full path of a cdo template file.")
+		os.Exit(1)
+	}
+
+	if reader, err = radar.Convert(os.Args[1], grdTemplate, instant); err != nil {
 		log.Fatal(err)
 	}
 
