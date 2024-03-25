@@ -40,3 +40,5 @@ go.work
 magda_rd2wrf
 !cli/**
 fixtures
+rom.ob.radar
+swi.ob.radar
