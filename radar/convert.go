@@ -200,15 +200,30 @@ func writeConvertedDataTo(resultW io.WriteCloser, dims *MosaicData, dtRequested 
 					lat,
 					lon)
 
-				writeRadarData(result, f2, 2000.0)
-				writeRadarData(result, f3, 3000.0)
-				writeRadarData(result, f4, 4000.0)
-				writeRadarData(result, f5, 5000.0)
-
-				writeRadarData(result, f6, 6000.0)
-				writeRadarData(result, f7, 7000.0)
-				writeRadarData(result, f8, 8000.0)
-				writeRadarData(result, f9, 9000.0)
+				if dims.Cappi2 != nil {
+					writeRadarData(result, f2, 2000.0)
+				}
+				if dims.Cappi3 != nil {
+					writeRadarData(result, f3, 3000.0)
+				}
+				if dims.Cappi4 != nil {
+					writeRadarData(result, f4, 4000.0)
+				}
+				if dims.Cappi5 != nil {
+					writeRadarData(result, f5, 5000.0)
+				}
+				if dims.Cappi6 != nil {
+					writeRadarData(result, f6, 6000.0)
+				}
+				if dims.Cappi7 != nil {
+					writeRadarData(result, f7, 7000.0)
+				}
+				if dims.Cappi8 != nil {
+					writeRadarData(result, f8, 8000.0)
+				}
+				if dims.Cappi9 != nil {
+					writeRadarData(result, f9, 9000.0)
+				}
 			}
 		}
 	}
