@@ -46,6 +46,40 @@ func writeConvertedDataTo(resultW io.WriteCloser, dims *MosaicData, dtRequested 
 	instant := dtRequested.Format("2006-01-02_15:04")
 	totObs := 0
 
+	totCappi := 0
+
+	if dims.Cappi2 != nil {
+		totCappi++
+	}
+
+	if dims.Cappi3 != nil {
+		totCappi++
+	}
+
+	if dims.Cappi4 != nil {
+		totCappi++
+	}
+
+	if dims.Cappi5 != nil {
+		totCappi++
+	}
+
+	if dims.Cappi6 != nil {
+		totCappi++
+	}
+
+	if dims.Cappi7 != nil {
+		totCappi++
+	}
+
+	if dims.Cappi8 != nil {
+		totCappi++
+	}
+
+	if dims.Cappi9 != nil {
+		totCappi++
+	}
+
 	if dims.Cappi2 != nil ||
 		dims.Cappi3 != nil ||
 		dims.Cappi4 != nil ||
@@ -122,11 +156,12 @@ func writeConvertedDataTo(resultW io.WriteCloser, dims *MosaicData, dtRequested 
 	//  write(301,'(a5,2x,a12,2(f8.3,2x),f8.1,2x,a19,2i6)') 'RADAR', &
 	//  radar_name, rlonr(irad), rlatr(irad), raltr(irad)*1000., &
 	//  trim(radar_date), np, imdv_nz(irad)
-	fmt.Fprintf(result, "RADAR              %8.3f  %8.3f     100.0  %s:00%6d     4\n",
+	fmt.Fprintf(result, "RADAR              %8.3f  %8.3f     100.0  %s:00%6d     %d\n",
 		maxLon,
 		maxLat,
 		instant,
 		totObs,
+		totCappi,
 	)
 
 	fmt.Fprintf(result, "#-------------------------------------------------------------------------------#\n")
@@ -161,29 +196,46 @@ func writeConvertedDataTo(resultW io.WriteCloser, dims *MosaicData, dtRequested 
 			f9 := float32(-1)
 			i := x + y*dims.Width
 
+			totCappi := 0
+
 			if dims.Cappi2 != nil {
 				f2 = dims.Cappi2[i]
+				totCappi++
 			}
+
 			if dims.Cappi3 != nil {
 				f3 = dims.Cappi3[i]
+				totCappi++
 			}
+
 			if dims.Cappi4 != nil {
 				f4 = dims.Cappi4[i]
+				totCappi++
 			}
+
 			if dims.Cappi5 != nil {
 				f5 = dims.Cappi5[i]
+				totCappi++
 			}
+
 			if dims.Cappi6 != nil {
 				f6 = dims.Cappi6[i]
+				totCappi++
 			}
+
 			if dims.Cappi7 != nil {
 				f7 = dims.Cappi7[i]
+				totCappi++
 			}
+
 			if dims.Cappi8 != nil {
 				f8 = dims.Cappi8[i]
+				totCappi++
 			}
+
 			if dims.Cappi9 != nil {
 				f9 = dims.Cappi9[i]
+				totCappi++
 			}
 
 			if f2 >= 0 || f3 >= 0 || f4 >= 0 || f5 >= 0 || f6 >= 0 || f7 >= 0 || f8 >= 0 || f9 >= 0 {
@@ -195,10 +247,12 @@ func writeConvertedDataTo(resultW io.WriteCloser, dims *MosaicData, dtRequested 
 					// trim(radar_date), plat(i), plon(i), raltr(irad)*1000, count_nz(i)
 
 					//"FM-128 RADAR   %s:00       %7.3f      %8.3f     100.0       3\n",
-					"FM-128 RADAR   %s:00  %12.3f  %12.3f     100.0       4\n",
+					"FM-128 RADAR   %s:00  %12.3f  %12.3f     100.0       %d\n",
 					instant,
 					lat,
-					lon)
+					lon,
+					totCappi,
+				)
 
 				if dims.Cappi2 != nil {
 					writeRadarData(result, f2, 2000.0)
