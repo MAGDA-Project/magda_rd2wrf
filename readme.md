@@ -38,6 +38,7 @@ netcdf to WRF ascii format.
 Usage of `magda_rd2wrf`:
 
 ```
+GRD_TEMPL=~/.magda_rd2wrf/swiss.grid.template
 magda_rd2wrf <inputdir> <outfilename> YYYYMMDDHHNN
 Options:
   -inputdir string
@@ -48,17 +49,8 @@ Options:
         date and hour of the radar data to convert [YYYYMMDDHH]
 ```
 
-cdo -remapbil,grid.template 202402121000-CAPPI02.nc 202402121000-CAPPI02-regrid.nc
+GRD_TEMPL is an environment variable that must be set to the CDO template file to use for regridding. 
+On Typhoon, there are two grid already defined in ~/.magda_rd2wrf:
 
-gridtype = lonlat
-xsize    = 678
-ysize    = 467
-xfirst   = -0.65
-xinc     = 0.0225
-yfirst   = 39.80
-yinc     = 0.0225
-
-i dati non ancora regrigliati, sono su filse in /home/wrfprod/magda
-
-[4:19 PM] Francesco Uboldi
-/rhomes/francesco.uboldi/MAGDA/nc_cappi/
+* swiss.grid.template for swiss radars
+* romania.grid.template for romania radars
