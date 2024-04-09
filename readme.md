@@ -27,7 +27,7 @@ module load CDO NCO
 ## Usage on CIMA Typhoon
 
 `magda_rd2wrf` is already present in /data/safe/home/wrfprod/bin/magda_rd2wrf
-A template file to regrid radar filse is already present in path `~/temp_Romania.nc`
+Template files to regrid radar for Romania and Switzerland is already present in path `~/.magda_rd2wrf`
 
 ## Command line usage
 
@@ -50,7 +50,7 @@ Options:
 ```
 
 GRD_TEMPL is an environment variable that must be set to the CDO template file to use for regridding. 
-On Typhoon, there are two grid already defined in ~/.magda_rd2wrf:
+On Typhoon, there are two grid template already defined in ~/.magda_rd2wrf:
 
-* swiss.grid.template for swiss radars
-* romania.grid.template for romania radars
+* swiss.grid.template for Switzerland radars
+* romania.grid.template for Romania radars
