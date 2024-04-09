@@ -27,6 +27,7 @@ module load CDO NCO
 ## Usage on CIMA Typhoon
 
 `magda_rd2wrf` is already present in /data/safe/home/wrfprod/bin/magda_rd2wrf
+
 Template files to regrid radar for Romania and Switzerland is already present in path `~/.magda_rd2wrf`
 
 ## Command line usage
