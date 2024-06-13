@@ -10,7 +10,7 @@
             "request": "launch",
             "mode": "debug",
             "program": "cli/magda_rd2wrf/cli.go",
-            "args": ["/home/parroit/repos/cima/magda/obstools/magda_rd2wrf/fixtures/swiss","swiss.ob.radar.ascii","202402121000"],
+            "args": ["/home/parroit/repos/cima/magda/obstools/magda_rd2wrf/fixtures/Radar_Francia","francia.ob.radar.ascii","202107051800"],
             "env": {"GRD_TEMPL": "/home/parroit/repos/cima/magda/obstools/magda_rd2wrf/scripts/swiss.grid.template"}
         },
         {
